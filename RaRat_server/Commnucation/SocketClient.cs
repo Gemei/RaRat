@@ -24,17 +24,14 @@ namespace RaRat_server
     class SocketClient
     {
         // ManualResetEvent instances signal completion.  
-        private static ManualResetEvent connectDone =
-            new ManualResetEvent(false);
-        private static ManualResetEvent sendDone =
-            new ManualResetEvent(false);
-        private static ManualResetEvent receiveDone =
-            new ManualResetEvent(false);
+        private static ManualResetEvent connectDone = new ManualResetEvent(false);
+        private static ManualResetEvent sendDone = new ManualResetEvent(false);
+        //private static ManualResetEvent receiveDone = new ManualResetEvent(false);
 
         // The response from the remote device.  
         private static string response = "";
 
-        public void startClient(string targetIP, int targetPort, string command)
+        public static void startClient(string targetIP, int targetPort, string command)
         {
             // Connect to a remote device. 
             try
@@ -131,7 +128,7 @@ namespace RaRat_server
                         response = state.sb.ToString();
                     }
                     // Signal that all bytes have been received.  
-                    receiveDone.Set();
+                    Controller.setClientResponsContent(response);
                 }
             }
             catch (Exception e)
@@ -168,13 +165,6 @@ namespace RaRat_server
             {
                 Console.WriteLine(e.ToString());
             }
-        }
-
-        public string getResponse()
-        {
-            // Create a task and supply a user delegate by using a lambda expression.
-            receiveDone.WaitOne();
-            return response;
         }
     }
 }

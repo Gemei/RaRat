@@ -1,35 +1,41 @@
 ﻿using RaRat_server.Commnucation;
 using System;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace RaRat_server
 {
     class Controller
     {
+        private static string serverRequestContent = "";
+        private static string clientResponseContent = "";
+
+        Thread socketClientThread;
+
         public Controller() {
-            //sendCommand("127.0.0.1", 8080, "Test");
-            //startListening();
-            SocketServer.StartListening();
+            sendCommand("127.0.0.1", 8080, "Test");
+            startListening();
         }
 
         void sendCommand(string IP, int port, string command)
         {
-            Thread socketClientThread = new Thread(()=>initSocketClient(IP, port, command));
-            socketClientThread.Start();
+            Task startClient = new Task(() => SocketClient.startClient(IP, port, command));
+            startClient.Start();
         }
-        void startListening() {
-            Thread socketClientThread = new Thread(() => initSocketServer());
-            socketClientThread.Start();
+        private void startListening() {
+            Task startServer = new Task(() => SocketServer.SetupServer());
+            startServer.Start();
         }
 
-        void initSocketClient(string IP, int port, string command) {
-            SocketClient socketClient = new SocketClient();
-            socketClient.startClient(IP, port, command);
-            Console.WriteLine(socketClient.getResponse());
+        public static void setServerRequestContent(string text) {
+            serverRequestContent = text;
+            Console.WriteLine(serverRequestContent);
         }
-        void initSocketServer()
+
+        public static void setClientResponsContent(string text)
         {
-            SocketServer.StartListening();
+            clientResponseContent = text;
+            Console.WriteLine(clientResponseContent);
         }
     }
 }
